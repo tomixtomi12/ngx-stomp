@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/index.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,EAAE,MAAY,sBAAsB,CAAC;AACnD,OAAO,EAAE,WAAW,EAAE,MAAY,uBAAuB,CAAC","file":"index.js","sourceRoot":"","sourcesContent":["export { Stomp }       from './stomp/stomp-client';\nexport { WebsocketRx }       from './socket/websocket-rx';\n"]}
