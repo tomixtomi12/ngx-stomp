@@ -2,10 +2,14 @@
  * This codes based on https://github.com/aszechlicki/stomp-ts/tree/develop
  */
 
-import {MessageSubscription, StompCommand, StompFrame, StompFrameError, StompFrameMessage} from './stomp-frame';
-import {BYTE, StompFrameDeserializer, StompFrameSerializer} from './stomp-frame-parser';
+import {BYTE, StompFrameDeserializer, StompFrameSerializer} from './parser/stomp-frame-parser';
 import {Subject} from 'rxjs/Subject';
 import {Observable} from 'rxjs/Observable';
+import {StompFrame} from './frames/stomp-frame';
+import {StompFrameMessage} from './frames/stomp-frame-message';
+import {StompFrameError} from './frames/stomp-frame-error';
+import {MessageSubscription} from './message-subscription';
+import {StompCommand} from './stomp-command';
 
 
 export const Stomp = {
@@ -29,6 +33,13 @@ export class StompConfig {
 
 
 export class StompClient {
+    get connectSubject(): Subject<StompFrame> {
+        return this._connectSubject;
+    }
+
+    set connectSubject(value: Subject<StompFrame>) {
+        this._connectSubject = value;
+    }
 
     private frameSerializer = new StompFrameSerializer();
     private frameDeserializer = new StompFrameDeserializer();
@@ -44,7 +55,7 @@ export class StompClient {
     private ponger: any;
     private partialData: string;
 
-    private connectSubject = new Subject<StompFrame>();
+    private _connectSubject = new Subject<StompFrame>();
     private receiptSubject = new Subject<StompFrame>();
     private messageSubject = new Subject<StompFrameMessage>();
     private errorSubject = new Subject<StompFrameError>();
@@ -78,7 +89,7 @@ export class StompClient {
     }
 
     public get onConnect(): Observable<StompFrame> {
-        return this.connectSubject;
+        return this._connectSubject;
     }
 
 
@@ -272,7 +283,7 @@ export class StompClient {
                 this.debug(`connected to server `, frame.getHeader('server'));
                 this.connected = true;
                 this.setupHeartbeat(frame);
-                this.connectSubject.next(frame);
+                this._connectSubject.next(frame);
                 break;
             // [MESSAGE Frame](http://stomp.github.com/stomp-specification-1.1.html#MESSAGE)
             case StompCommand.MESSAGE:

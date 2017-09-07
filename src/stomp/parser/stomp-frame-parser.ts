@@ -1,6 +1,9 @@
 // Define constants for bytes used throughout the code
-import {FrameBuffer, StompCommand, StompFrame} from './stomp-frame';
 
+
+import {FrameBuffer} from './frame-buffer';
+import {StompCommand} from '../stomp-command';
+import {StompFrame} from '../frames/stomp-frame';
 
 export const BYTE = {
     // LINEFEED byte (octet 10)

@@ -1,64 +1,8 @@
 
-import {Observable} from 'rxjs/Rx';
-
-export interface FrameBuffer {
-  frames: StompFrame[];
-  partial: string;
-}
-
-export class MessageSubscription {
-
-  constructor(
-    private _id: string,
-    private _destination: string,
-    private _messages: Observable<StompFrameMessage>) {
-
-  }
-
-  /**
-   * Gets the internal subscription id
-   * @returns {string}
-   */
-  public get subscriptionId(): string{ return this._id; }
-
-  /**
-   * Gets the subsription destionation
-   * @returns {string}
-   */
-  public get destination(): string{ return this._destination; }
-
-  /**
-   * Gets an observable stream of all messages of this subscription.
-   */
-  public get messages(): Observable<StompFrameMessage> {
-    return this._messages
-        .filter(m => m.subscriptionId === this.subscriptionId);
-  }
-}
-
-
-export enum StompCommand {
-  ACK,
-  NACK,
-  ABORT,
-  BEGIN,
-  COMMIT,
-  CONNECT,
-  CONNECTED,
-  DISCONNECT,
-  MESSAGE,
-  RECEIPT,
-  SUBSCRIBE,
-  UNSUBSCRIBE,
-  SEND,
-  ERROR
-}
+import {StompCommand} from '../stomp-command';
 
 
 export class StompFrame {
-
-
-
 
     private _command: StompCommand;
     private _body: string = null;
@@ -137,38 +81,6 @@ export class StompFrame {
     public get headers(): Map<string, string>{ return this._headers; }
 }
 
-export class StompFrameMessage extends StompFrame {
-  constructor(frame: StompFrame) {
-    super(frame.command, frame.body, frame.headers);
-  }
 
-  public get messageId(): string {
-    return this.getRequiredHeader('message-id');
-  }
 
-  public get destination(): string {
-    return this.getRequiredHeader('destination');
-  }
 
-  public get subscriptionId(): string {
-    return this.getRequiredHeader('subscription');
-  }
-}
-
-export class StompFrameError extends StompFrame {
-
-  constructor(message: string, frame?: StompFrame) {
-    super(StompCommand.ERROR, frame != null ? frame.body : null, frame != null ? frame.headers : null);
-    if (message) {
-      this.setHeader('message', message);
-    }
-  }
-
-  public get errorMessage(): string {
-    return this.getHeader('message');
-  }
-
-  public get errorDetail(): string {
-    return this.body;
-  }
-}
