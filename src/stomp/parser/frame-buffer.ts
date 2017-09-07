@@ -2,7 +2,12 @@
 
 import {StompFrame} from '../frames/stomp-frame';
 
-export interface FrameBuffer {
-    frames: StompFrame[];
-    partial: string;
+export class FrameBuffer {
+
+    public static readonly Empty = new FrameBuffer();
+
+
+    public frames: StompFrame[] = [];
+    public partial = '';
+    constructor() { }
 }

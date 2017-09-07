@@ -18,7 +18,7 @@ export const BYTE = {
 export class StompFrameDeserializer {
 
 
-    public deserializeMessage(message: any) {
+    public deserializeMessage(message: any): FrameBuffer {
         let data: string;
         if (typeof ArrayBuffer && message instanceof ArrayBuffer) {
             let arr = new Uint8Array(message);
@@ -34,7 +34,7 @@ export class StompFrameDeserializer {
         // If heart-beats are requested and no real frame is sent, EOL is expected
         if (data === BYTE.LF) {
             console.log('<<< heart-beat received');
-            return;
+            return FrameBuffer.Empty;
         }
 
         return this.deserializeFrames(data);
@@ -44,10 +44,7 @@ export class StompFrameDeserializer {
     private deserializeFrames(data: string): FrameBuffer {
         let frames = data.split(`${BYTE.NULL}${BYTE.LF}*`);
 
-        let buffer: FrameBuffer = {
-            frames: [],
-            partial: ''
-        };
+        let buffer = new FrameBuffer();
 
         for (let i = 0; i < frames.length - 1; i++) {
             buffer.frames.push(this.deserializeFrame(frames[i]));
@@ -73,7 +70,7 @@ export class StompFrameDeserializer {
             // console.log('console', divider);
             // console.log("data chars", data.split(''));
 
-            let commandStr: string = headerLines.shift();
+            let commandStr = headerLines.shift();
             let headers = new Map<string, string>();
             let body = '';
 
@@ -84,11 +81,14 @@ export class StompFrameDeserializer {
 
             // skip the 2 LF bytes that divides the headers from the body
             let start = divider + 2;
-            if (headers.get('content-length')) {
-                let len = parseInt(headers.get('content-length'));
+
+            const clen = headers.get('content-length');
+
+            if (clen) {
+                let len = parseInt(clen);
                 body = ('' + data).substring(start, start + len);
             } else {
-                let chr: string = null;
+                let chr: string;
                 for (let i = 0; i < data.length; i++) {
                     chr = data.charAt(i);
                     if (chr === BYTE.NULL) {
@@ -97,7 +97,12 @@ export class StompFrameDeserializer {
                     body += chr;
                 }
             }
-            return new StompFrame(this.parseCommand(commandStr), body, headers);
+            if (commandStr) {
+                const command = this.parseCommand(commandStr);
+                return new StompFrame(command, body, headers);
+            }else {
+                throw new Error('ArgumentNullException: commandStr was \'null\' which is not a valid command string!');
+            }
         }catch (err) {
             // Failed to deserialize frame
             console.warn('Failed to parse frame:', data);
@@ -106,7 +111,6 @@ export class StompFrameDeserializer {
     }
 
     private parseCommand(commandStr: string): StompCommand {
-        if (!commandStr) { throw new Error('ArgumentNullException: commandStr was \'null\' which is not a valid command string!'); }
         let command = StompCommand[commandStr as keyof typeof StompCommand];
         if (!command) {
             throw new Error(`Could not parse command '${commandStr}' into a STOMP command!`);
@@ -132,9 +136,11 @@ export class StompFrameSerializer {
      * @param {string} value
      * @returns {number} number of bytes in the string
      */
-    private static getUTF8Length(value: string): number {
+    private static getUTF8Length(value: string | null): number {
         if (value) {
-            return encodeURI(value).match(/%..|./g).length;
+            const encoded = encodeURI(value);
+            const match =  encoded.match(/%..|./g);
+            return match ? match.length : 0;
         }
         return 0;
     }

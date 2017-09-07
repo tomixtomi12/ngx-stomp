@@ -6,18 +6,22 @@ import {StompCommand} from '../stomp-command';
 
 export class StompFrameError extends StompFrame {
 
-    constructor(message: string, frame?: StompFrame) {
-        super(StompCommand.ERROR, frame != null ? frame.body : null, frame != null ? frame.headers : null);
+    constructor(message: string | null, frame?: StompFrame) {
+        super(
+            StompCommand.ERROR,
+            frame ? frame.body : null,
+            frame ? frame.headers : undefined);
+
         if (message) {
             this.setHeader('message', message);
         }
     }
 
-    public get errorMessage(): string {
+    public get errorMessage(): string | null {
         return this.getHeader('message');
     }
 
-    public get errorDetail(): string {
+    public get errorDetail(): string | null {
         return this.body;
     }
 }

@@ -112,7 +112,9 @@ export class StompClient {
         this.ws.onmessage = (evt: MessageEvent) => {
             let unmarshalledData = this.frameDeserializer.deserializeMessage(evt.data);
             this.serverActivity = Date.now();
-            unmarshalledData.frames.forEach(f => this.handleFrame(f));
+            unmarshalledData.frames.forEach(
+                f => this.handleFrame(f)
+            );
         };
 
         this.ws.onclose = () => {
@@ -143,7 +145,7 @@ export class StompClient {
      */
     public disconnect(disconnectCallback: () => {}, headers: Map<string, string>): void {
         this.transmit(StompCommand.DISCONNECT, headers);
-        this.ws.onclose = null;
+        this.ws.onclose = <any>null;
         this.ws.close();
         this.cleanup();
         disconnectCallback();
@@ -173,7 +175,8 @@ export class StompClient {
             headers = new Map<string, string>();
         }
 
-        let subId = headers.get('id') ? headers.get('id') : `sub-${this.counter++}`;
+        const headerId = headers.get('id');
+        const subId = headerId ? headerId : `sub-${this.counter++}`;
         headers.set('id', subId);
 
         let sub = new MessageSubscription(subId, destination, this.messages);
@@ -325,29 +328,33 @@ export class StompClient {
 
         // heart-beat header received from the server looks like:
         // heart-beat: sx, sy
-        const heartBeat = frame.getHeader('heart-beat').split(',').map(parseInt);
-        const serverIncoming = heartBeat[0];
-        const serverOutgoing = heartBeat[1];
+        const heartBeatHeader = frame.getHeader('heart-beat');
 
-        if (this.heartbeat.outgoing > 0 && serverOutgoing > 0) {
-            let ttl = Math.max(this.heartbeat.outgoing, serverOutgoing);
-            this.debug(`Check PING every ${ttl}ms`);
+        if (heartBeatHeader) {
+            const heartBeat = heartBeatHeader.split(',').map(parseInt);
+            const serverIncoming = heartBeat[0];
+            const serverOutgoing = heartBeat[1];
 
-            this.pinger = setInterval(() => {
-                this.sendHeartBeat();
-            }, ttl);
-        }
+            if (this.heartbeat.outgoing > 0 && serverOutgoing > 0) {
+                let ttl = Math.max(this.heartbeat.outgoing, serverOutgoing);
+                this.debug(`Check PING every ${ttl}ms`);
 
-        if (this.heartbeat.incoming > 0 && serverIncoming > 0) {
-            let ttl = Math.max(this.heartbeat.incoming, serverIncoming);
-            this.debug(`check PONG every ${ttl}ms`);
-            this.ponger = setInterval(() => {
-                let delta = Date.now() - this.serverActivity;
-                if (delta > ttl * 2) {
-                    this.debug(`Did not receive server activity for the last ${delta}ms`);
-                    this.ws.close();
-                }
-            }, ttl);
+                this.pinger = setInterval(() => {
+                    this.sendHeartBeat();
+                }, ttl);
+            }
+
+            if (this.heartbeat.incoming > 0 && serverIncoming > 0) {
+                let ttl = Math.max(this.heartbeat.incoming, serverIncoming);
+                this.debug(`check PONG every ${ttl}ms`);
+                this.ponger = setInterval(() => {
+                    let delta = Date.now() - this.serverActivity;
+                    if (delta > ttl * 2) {
+                        this.debug(`Did not receive server activity for the last ${delta}ms`);
+                        this.ws.close();
+                    }
+                }, ttl);
+            }
         }
     }
 

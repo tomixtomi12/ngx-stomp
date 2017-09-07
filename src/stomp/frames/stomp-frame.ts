@@ -5,16 +5,16 @@ import {StompCommand} from '../stomp-command';
 export class StompFrame {
 
     private _command: StompCommand;
-    private _body: string = null;
+    private _body: string | null = null;
     private _headers: Map<string, string>;
 
-    public static build(command: StompCommand, headers: Map<string, string>, body: string): StompFrame {
-        return new StompFrame(command, body, headers);
+    public static build(command: StompCommand, headers: Map<string, string>, body?: string): StompFrame {
+        return new StompFrame(command, body ? body : null, headers);
     }
 
     constructor(
         command: StompCommand,
-        body: string,
+        body: string | null,
         headers?: Map<string, string>) {
 
         if (!command) { throw new Error('ArgumentNullException: "command"'); }
@@ -33,7 +33,7 @@ export class StompFrame {
         return this._command;
     }
 
-    public get body(): string {
+    public get body(): string | null {
         return this._body;
     }
 
@@ -52,7 +52,8 @@ export class StompFrame {
      * @returns {undefined|string}
      */
     public getHeader(key: string): string | null {
-        return this._headers.get(key);
+        const value = this._headers.get(key);
+        return value ? value : null;
     }
 
     /**
