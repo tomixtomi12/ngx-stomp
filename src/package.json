@@ -1,6 +1,6 @@
 {
   "name": "@elderbyte/ngx-stomp",
-  "version": "0.1.4",
+  "version": "0.2.9",
   "description": "Stomp client for Angular Typescript.",
   "repository": {
     "type": "git",
@@ -23,8 +23,8 @@
   "module": "ngx-stomp.js",
   "jsnext:main": "ngx-stomp.js",
   "typings": "ngx-stomp.d.ts",
-  "dependencies":{
-    "@types/sockjs-client": "^1.0.32"
+  "dependencies": {
+    "sockjs-client": "^1.1.4"
   },
   "peerDependencies": {
     "@angular/core": "^4.0.0",

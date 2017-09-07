@@ -14,12 +14,10 @@ import * as SockJS from 'sockjs-client';
 
 
 export class Stomp {
-    public static readonly VERSIONS: {
-        V1_0: '1.0',
-        V1_1: '1.1',
-        V1_2: '1.2'
-    };
 
+    public static readonly V1_0 = '1.0';
+    public static readonly V1_1 = '1.1';
+    public static readonly V1_2 = '1.2';
     public static readonly supportedVersions: '1.1,1.0';
 
     /**
@@ -381,7 +379,10 @@ export class StompClient {
     }
 
     private setupHeartbeat(frame: StompFrame) {
-        if (!frame.getHeader('version') || frame.getHeader('version') === Stomp.VERSIONS.V1_0) {
+
+        const version = frame.getHeader('version');
+
+        if (!version || version === Stomp.V1_0) {
             return;
         }
 

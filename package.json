@@ -57,7 +57,7 @@
     "tslint": "~4.5.0",
     "typescript": "~2.3.4",
     "zone.js": "^0.8.4",
-    "@types/sockjs-client": "^1.0.32"
+    "sockjs-client": "^1.1.4"
   },
   "engines": {
     "node": ">=6.0.0"
