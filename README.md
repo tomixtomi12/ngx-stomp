@@ -5,6 +5,11 @@
 
 Simple angular stomp library.
 
+## Features
+
+* Supports native websocket transport
+* Supports SockJS emulated websocket transport
+
 
 ## Installation
 
@@ -25,31 +30,23 @@ $ npm install @elderbyte/ngx-stomp
 and then from your Angular `AppModule`:
 
 ```typescript
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-
-import { AppComponent } from './app.component';
 
 // Import your library
 import { StompModule } from '@elderbyte/ngx-stomp';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
   imports: [
-    BrowserModule,
-
-    // Specify your library as an import
-    StompModule
+    // Configure StompModule
+    StompModule.forRoot({
+      endpointUrl: '/stomp',
+      withSockJs: true
+    }),
   ],
-  providers: [],
-  bootstrap: [AppComponent]
 })
 export class AppModule { }
 ```
 
-Once your library is imported, you can use its components, directives and pipes in your Angular application.
+Once your library is imported, you can use the `StompService` by importing it into your own services / components.
 
 ## Development
 
