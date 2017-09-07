@@ -1,4 +1,4 @@
 
-export { Stomp }       from './stomp/stomp-client';
-export { WebsocketRx }       from './socket/websocket-rx';
+export * from './socket/index';
+export * from './stomp/index';
 
