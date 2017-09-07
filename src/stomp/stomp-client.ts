@@ -10,6 +10,7 @@ import {StompFrameMessage} from './frames/stomp-frame-message';
 import {StompFrameError} from './frames/stomp-frame-error';
 import {MessageSubscription} from './message-subscription';
 import {StompCommand} from './stomp-command';
+import * as SockJS from 'sockjs-client';
 
 
 export class Stomp {
@@ -26,7 +27,8 @@ export class Stomp {
      * @param {string} url
      */
     public static clientSockJs(url: string) {
-        throw new Error('Not yet supported!');
+        const sockJs = new SockJS(url);
+        return this.clientOver(<any>sockJs);
     }
 
     /**

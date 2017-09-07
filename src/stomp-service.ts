@@ -71,10 +71,7 @@ export class StompService {
 
     private connectStomp(): void {
 
-        const socketEndpoint = this.buildWebSocketUrl(this.configuration.endpointUrl);
-
-        console.log('Creating websocket at ' + socketEndpoint);
-        this._client = Stomp.client(socketEndpoint);
+        this._client = this.openConnection();
 
         this._client.errors.subscribe(m => {
             console.log('Got STOMP ERROR!', m);
@@ -92,6 +89,26 @@ export class StompService {
 
         console.log('Attempting to connect to STOMP ...');
         this._client.connect();
+    }
+
+
+    private openConnection(): StompClient {
+        if (!this.configuration.withSockJs) {
+            // Native Websocket
+            const socketEndpoint = this.buildWebSocketUrl(this.configuration.endpointUrl);
+            console.log('Creating native websocket client at ' + socketEndpoint);
+            return Stomp.client(socketEndpoint);
+        }else {
+            // SockJS Transport supporting fallbacks
+            const sockJsEndpoint = this.buildSockJsUrl(this.configuration.endpointUrl);
+            console.log('Creating SockJS client at ' + sockJsEndpoint);
+            return Stomp.clientSockJs(sockJsEndpoint);
+        }
+    }
+
+
+    private buildSockJsUrl(path: string) {
+        return this.toAbsoluteUrl(path);
     }
 
     private buildWebSocketUrl(path: string): string {

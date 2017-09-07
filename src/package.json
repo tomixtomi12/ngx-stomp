@@ -23,6 +23,9 @@
   "module": "ngx-stomp.js",
   "jsnext:main": "ngx-stomp.js",
   "typings": "ngx-stomp.d.ts",
+  "dependencies":{
+    "@types/sockjs-client": "^1.0.32"
+  },
   "peerDependencies": {
     "@angular/core": "^4.0.0",
     "@angular/common": "^4.0.0",
