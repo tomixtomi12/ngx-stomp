@@ -2,16 +2,111 @@
 import * as SockJS from 'sockjs-client';
 import {StompClient} from './stomp-client';
 
-
+/**
+ * Provides the ability to build StompClients
+ */
 export class StompClientBuilder {
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Fields                                                                  *
+     *                                                                         *
+     **************************************************************************/
+
+    private readonly _url: string;
+    private _enableSockJS = false;
+    private _protocols: string[] = ['v10.stomp', 'v11.stomp'];
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Static                                                                  *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Creates a new StompClientBuilder, using the given endpoint url.
+     *
+     * @param {string} endpointUrl
+     * @returns {StompClientBuilder}
+     */
+    public static start(endpointUrl: string): StompClientBuilder {
+        return new StompClientBuilder(endpointUrl);
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
+
+    private constructor(url: string) {
+        this._url = url;
+    }
+
+
+    /***************************************************************************
+     *                                                                         *
+     * API                                                                     *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Enable/Disable SockJS for the STOMP transport
+     *
+     *  @param {boolean} enabled Enable or disable sock-js
+     * @returns {this}
+     */
+    public enableSockJS(enabled = true): this {
+        this._enableSockJS = enabled;
+        return this;
+    }
+
+    /**
+     * Define the support protocols
+     * @param {string[]} protocols
+     * @returns {this}
+     */
+    public protocols(protocols: string[]): this {
+        this._protocols = protocols;
+        return this;
+    }
+
+
+    /**
+     * Materializes the configuration into a stomp client.
+     * @returns {StompClient}
+     */
+    public build(): StompClient {
+        const socket = this.getSocket();
+        return this.buildClientWith(socket);
+    }
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Private methods                                                         *
+     *                                                                         *
+     **************************************************************************/
+
+
+    private getSocket(): WebSocket {
+        if (this._enableSockJS) {
+            return this.buildSockJS(this._url);
+        }else {
+            return this.buildNativeWebSocket(this._url);
+        }
+    }
+
 
     /**
      * Builds a Stomp client using SockJs as transport
      * @param {string} url
      */
-    public static clientSockJs(url: string) {
+    private buildSockJS(url: string): WebSocket {
         const sockJs = new SockJS(url);
-        return this.clientOver(<any>sockJs);
+        return <WebSocket>sockJs;
     }
 
     /**
@@ -20,9 +115,8 @@ export class StompClientBuilder {
      * @param {string[]} protocols
      * @returns {StompClient}
      */
-    public static client(url: string, protocols: string[] = ['v10.stomp', 'v11.stomp']) {
-        let ws = new WebSocket(url, protocols);
-        return StompClientBuilder.clientOver(ws);
+    private buildNativeWebSocket(url: string) {
+        return new WebSocket(url, this._protocols);
     }
 
     /**
@@ -30,7 +124,7 @@ export class StompClientBuilder {
      * @param {WebSocket} ws
      * @returns {StompClient}
      */
-    public static clientOver(ws: WebSocket) {
+    private buildClientWith(ws: WebSocket) {
         return new StompClient(ws);
     }
 }

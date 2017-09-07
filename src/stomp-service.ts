@@ -94,17 +94,9 @@ export class StompService {
 
 
     private openConnection(): StompClient {
-        if (!this.configuration.withSockJs) {
-            // Native Websocket
-            const socketEndpoint = this.buildWebSocketUrl(this.configuration.endpointUrl);
-            console.log('Creating native websocket client at ' + socketEndpoint);
-            return StompClientBuilder.client(socketEndpoint);
-        }else {
-            // SockJS Transport supporting fallbacks
-            const sockJsEndpoint = this.buildSockJsUrl(this.configuration.endpointUrl);
-            console.log('Creating SockJS client at ' + sockJsEndpoint);
-            return StompClientBuilder.clientSockJs(sockJsEndpoint);
-        }
+       return StompClientBuilder.start(this.configuration.endpointUrl)
+            .enableSockJS(this.configuration.withSockJs)
+            .build();
     }
 
 
