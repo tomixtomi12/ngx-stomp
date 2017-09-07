@@ -1,0 +1,32 @@
+{
+  "name": "@elderbyte/ngx-stomp",
+  "version": "0.0.1",
+  "description": "Stomp client for Angular Typescript.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ElderByte-/ngx-stomp"
+  },
+  "author": {
+    "name": "ElderByte AG",
+    "email": "info@elderbyte.com"
+  },
+  "keywords": [
+    "angular",
+    "stomp",
+    "web-sockets"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ElderByte-/ngx-stomp/issues"
+  },
+  "main": "ngx-stomp.umd.js",
+  "module": "ngx-stomp.js",
+  "jsnext:main": "ngx-stomp.js",
+  "typings": "ngx-stomp.d.ts",
+  "peerDependencies": {
+    "@angular/core": "^4.0.0",
+    "@angular/common": "^4.0.0",
+    "rxjs": "^5.1.0",
+    "zone.js": "^0.8.4"
+  }
+}

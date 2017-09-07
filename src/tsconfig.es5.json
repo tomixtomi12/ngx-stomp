@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "target": "es5",
+    "baseUrl": ".",
+    "stripInternal": false,
+    "strictNullChecks": true,
+    "importHelpers": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "module": "es2015",
+    "moduleResolution": "node",
+    "inlineSources": true,
+    "outDir": "../build",
+    "rootDir": ".",
+    "sourceMap": true,
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "skipLibCheck": true,
+    "types": []
+  },
+  "angularCompilerOptions": {
+    "annotateForClosureCompiler": true,
+    "strictMetadataEmit": true,
+    "skipTemplateCodegen": true,
+    "flatModuleOutFile": "ngx-stomp.js",
+    "flatModuleId": "@elderbyte/ngx-stomp"
+  },
+  "files": [
+    "./index.ts"
+  ]
+}

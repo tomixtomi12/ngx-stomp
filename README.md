@@ -5,31 +5,66 @@
 
 Simple angular stomp library.
 
-## Using
 
-Install via npm
-```
-npm i @elderbyte/ngx-stomp --save
+## Installation
+
+To install this library, run:
+
+```bash
+$ npm install @elderbyte/ngx-stomp --save
 ```
 
-Import via JS import statement
+## Consuming your library
 
+Once you have published your library to npm, you can import your library in any Angular application by running:
+
+```bash
+$ npm install @elderbyte/ngx-stomp
 ```
-import {Stomp} from "@elderbyte/ngx-stomp";
+
+and then from your Angular `AppModule`:
+
+```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+import { AppComponent } from './app.component';
+
+// Import your library
+import { StompModule } from '@elderbyte/ngx-stomp';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+
+    // Specify your library as an import
+    StompModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
 ```
+
+Once your library is imported, you can use its components, directives and pipes in your Angular application.
 
 ## Development
 
-After you have added and tested a new feature, publish a new version on npm:
+To generate all `*.js`, `*.d.ts` and `*.metadata.json` files:
 
-1. Increment the version in `package.json` and `dist/package.json` - they must have the same version
-2. Build the library into the `/dist` directory by running `npm run build` from the project root directory.
-3. Commit the compiled `/dist` changes
-4. Run `npm publish dist --access=public` from the project root directory or `npm publish --access=public` from within the dist directory.
+```bash
+$ npm run build
+```
 
-**Note** `--access=public` is only neccessary if you publish the package the **first time**. If you omit this parameter the first time, you'll get a error message that you need a paid account.
+To lint all `*.ts` files:
 
+```bash
+$ npm run lint
+```
 
 ## License
 
-MIT
+MIT © [ElderByte AG](mailto:info@elderbyte.com)
