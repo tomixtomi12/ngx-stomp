@@ -6,7 +6,7 @@ import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 
 
-export interface StompConfiguration {
+export class StompConfiguration {
     endpointUrl: string;
 }
 
@@ -34,7 +34,7 @@ export class StompService {
 
     constructor(
         private configuration: StompConfiguration) {
-
+        this.connectStomp();
     }
 
     /***************************************************************************
