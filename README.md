@@ -11,20 +11,12 @@ Simple Angular (4+) STOMP over Websocket library.
 * Supports SockJS emulated websocket transport
 
 
-## Installation
+## Consuming your library
 
 To install this library, run:
 
 ```bash
 $ npm install @elderbyte/ngx-stomp --save
-```
-
-## Consuming your library
-
-Once you have published your library to npm, you can import your library in any Angular application by running:
-
-```bash
-$ npm install @elderbyte/ngx-stomp
 ```
 
 and then from your Angular `AppModule`:
