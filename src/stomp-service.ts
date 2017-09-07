@@ -95,7 +95,7 @@ export class StompService {
     private toAbsoluteUrl(url: string): string {
         if (!url.startsWith('http://')) {
             if (!url.endsWith('/')) {
-                url += url + '/'; // Ensure relative url ends with slash
+                url = url + '/'; // Ensure relative url ends with slash
             }
             return window.location.protocol + '//' + window.location.host + url;
         }
