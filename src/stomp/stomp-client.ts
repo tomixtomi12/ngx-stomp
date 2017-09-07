@@ -33,13 +33,12 @@ export class StompConfig {
 
 
 export class StompClient {
-    get connectSubject(): Subject<StompFrame> {
-        return this._connectSubject;
-    }
 
-    set connectSubject(value: Subject<StompFrame>) {
-        this._connectSubject = value;
-    }
+    /***************************************************************************
+     *                                                                         *
+     * Fields                                                                  *
+     *                                                                         *
+     **************************************************************************/
 
     private frameSerializer = new StompFrameSerializer();
     private frameDeserializer = new StompFrameDeserializer();
@@ -70,10 +69,35 @@ export class StompClient {
     private maxWebSocketFrameSize = 16 * 1024;
     private subscriptions = new Map<string, MessageSubscription>();
 
+
+    /***************************************************************************
+     *                                                                         *
+     * Constructor                                                             *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Creates a new STOMP Client using the given websocket
+     * @param {WebSocket} ws
+     */
     constructor(private ws: WebSocket) {
         this.ws.binaryType = 'arraybuffer';
 
         console.log('socket state:', ws.readyState);
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Public API                                                              *
+     *                                                                         *
+     **************************************************************************/
+
+    public get connectSubject(): Subject<StompFrame> {
+        return this._connectSubject;
+    }
+
+    public set connectSubject(value: Subject<StompFrame>) {
+        this._connectSubject = value;
     }
 
     public get receipts(): Observable<StompFrame>{
@@ -272,6 +296,14 @@ export class StompClient {
         }
         this.transmit(StompCommand.NACK, headers);
     }
+
+
+    /***************************************************************************
+     *                                                                         *
+     * Private methods                                                         *
+     *                                                                         *
+     **************************************************************************/
+
 
     private cleanup() {
         this.connected = false;
