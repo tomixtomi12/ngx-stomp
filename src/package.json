@@ -1,6 +1,6 @@
 {
   "name": "@elderbyte/ngx-stomp",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Stomp client for Angular Typescript.",
   "repository": {
     "type": "git",
