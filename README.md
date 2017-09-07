@@ -3,7 +3,7 @@
 
 # Angular Stomp
 
-Simple angular stomp library.
+Simple Angular (4+) STOMP over Websocket library.
 
 ## Features
 
