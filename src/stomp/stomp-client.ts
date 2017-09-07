@@ -10,45 +10,7 @@ import {StompFrameMessage} from './frames/stomp-frame-message';
 import {StompFrameError} from './frames/stomp-frame-error';
 import {MessageSubscription} from './message-subscription';
 import {StompCommand} from './stomp-command';
-import * as SockJS from 'sockjs-client';
 
-
-export class Stomp {
-
-    public static readonly V1_0 = '1.0';
-    public static readonly V1_1 = '1.1';
-    public static readonly V1_2 = '1.2';
-    public static readonly supportedVersions: '1.1,1.0';
-
-    /**
-     * Builds a Stomp client using SockJs as transport
-     * @param {string} url
-     */
-    public static clientSockJs(url: string) {
-        const sockJs = new SockJS(url);
-        return this.clientOver(<any>sockJs);
-    }
-
-    /**
-     * Builds a Stomp client using default browser websocket as transport
-     * @param {string} url
-     * @param {string[]} protocols
-     * @returns {StompClient}
-     */
-    public static client(url: string, protocols: string[] = ['v10.stomp', 'v11.stomp']) {
-        let ws = new WebSocket(url, protocols);
-        return Stomp.clientOver(ws);
-    }
-
-    /**
-     * Builds a Stomp client using the given websocket implementation
-     * @param {WebSocket} ws
-     * @returns {StompClient}
-     */
-    public static clientOver(ws: WebSocket) {
-        return new StompClient(ws);
-    }
-}
 
 export class StompConfig {
     public headers = new Map<string, string>();
@@ -64,6 +26,11 @@ export class StompClient {
      * Fields                                                                  *
      *                                                                         *
      **************************************************************************/
+
+    public static readonly V1_0 = '1.0';
+    public static readonly V1_1 = '1.1';
+    public static readonly V1_2 = '1.2';
+    public static readonly supportedVersions: '1.1,1.0';
 
     private frameSerializer = new StompFrameSerializer();
     private frameDeserializer = new StompFrameDeserializer();
@@ -382,7 +349,7 @@ export class StompClient {
 
         const version = frame.getHeader('version');
 
-        if (!version || version === Stomp.V1_0) {
+        if (!version || version === StompClient.V1_0) {
             return;
         }
 

@@ -1,9 +1,10 @@
 
 
 import {Injectable} from '@angular/core';
-import {Stomp, StompClient} from './stomp/stomp-client';
+import {StompClient} from './stomp/stomp-client';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
+import {StompClientBuilder} from './stomp/stomp-client-builder';
 
 
 export class StompConfiguration {
@@ -97,12 +98,12 @@ export class StompService {
             // Native Websocket
             const socketEndpoint = this.buildWebSocketUrl(this.configuration.endpointUrl);
             console.log('Creating native websocket client at ' + socketEndpoint);
-            return Stomp.client(socketEndpoint);
+            return StompClientBuilder.client(socketEndpoint);
         }else {
             // SockJS Transport supporting fallbacks
             const sockJsEndpoint = this.buildSockJsUrl(this.configuration.endpointUrl);
             console.log('Creating SockJS client at ' + sockJsEndpoint);
-            return Stomp.clientSockJs(sockJsEndpoint);
+            return StompClientBuilder.clientSockJs(sockJsEndpoint);
         }
     }
 
