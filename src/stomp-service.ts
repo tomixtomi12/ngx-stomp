@@ -7,7 +7,17 @@ import {ReplaySubject} from 'rxjs/ReplaySubject';
 
 
 export class StompConfiguration {
-    endpointUrl: string;
+
+    /**
+     * The websocket / sockJS endpoint
+     */
+    public endpointUrl: string;
+
+    /**
+     * Use SockJS as transport handler. (default false)
+     * If not used, standard browser websocket connection is used.
+     */
+    public withSockJs?: boolean;
 }
 
 

@@ -12,18 +12,43 @@ import {MessageSubscription} from './message-subscription';
 import {StompCommand} from './stomp-command';
 
 
-export const Stomp = {
-    VERSIONS: {
+export class Stomp {
+    public static readonly VERSIONS: {
         V1_0: '1.0',
         V1_1: '1.1',
         V1_2: '1.2'
-    },
-    supportedVersions: '1.1,1.0',
-    client: (url: string, protocols: string[] = ['v10.stomp', 'v11.stomp']) => {
+    };
+
+    public static readonly supportedVersions: '1.1,1.0';
+
+    /**
+     * Builds a Stomp client using SockJs as transport
+     * @param {string} url
+     */
+    public static clientSockJs(url: string) {
+        throw new Error('Not yet supported!');
+    }
+
+    /**
+     * Builds a Stomp client using default browser websocket as transport
+     * @param {string} url
+     * @param {string[]} protocols
+     * @returns {StompClient}
+     */
+    public static client(url: string, protocols: string[] = ['v10.stomp', 'v11.stomp']) {
         let ws = new WebSocket(url, protocols);
+        return Stomp.clientOver(ws);
+    }
+
+    /**
+     * Builds a Stomp client using the given websocket implementation
+     * @param {WebSocket} ws
+     * @returns {StompClient}
+     */
+    public static clientOver(ws: WebSocket) {
         return new StompClient(ws);
     }
-};
+}
 
 export class StompConfig {
     public headers = new Map<string, string>();
