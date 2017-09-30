@@ -118,7 +118,7 @@ export class StompClientBuilder {
      * @param {string[]} protocols
      * @returns {StompClient}
      */
-    private buildNativeWebSocket(url: string) {
+    private buildNativeWebSocket(url: string): WebSocket {
         return new WebSocket(url, this._protocols);
     }
 
@@ -127,7 +127,7 @@ export class StompClientBuilder {
      * @param {WebSocket} ws
      * @returns {StompClient}
      */
-    private buildClientWith(ws: WebSocket) {
+    private buildClientWith(ws: WebSocket): StompClient {
         return new StompClient(this._logger, ws);
     }
 }
