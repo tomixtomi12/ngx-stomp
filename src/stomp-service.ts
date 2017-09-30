@@ -101,27 +101,4 @@ export class StompService {
             .build();
     }
 
-
-    private buildSockJsUrl(path: string) {
-        return this.toAbsoluteUrl(path);
-    }
-
-    private buildWebSocketUrl(path: string): string {
-        let socketEndpoint = this.toAbsoluteUrl(path);
-        socketEndpoint = socketEndpoint.replace('http://', 'ws://');
-        socketEndpoint = socketEndpoint.replace('https://', 'wss://');
-        // let socketEndpoint = "ws://172.16.29.1:8080/stomp/websocket"; // SockJS
-        return socketEndpoint;
-    }
-
-    private toAbsoluteUrl(url: string): string {
-        if (!url.startsWith('http://')) {
-            if (!url.startsWith('/')) {
-                url =  '/' + url; // Ensure relative url starts with slash
-            }
-            return window.location.protocol + '//' + window.location.host + url;
-        }
-        return url;
-    }
-
 }
