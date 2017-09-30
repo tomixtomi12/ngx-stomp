@@ -5,6 +5,7 @@ import {StompClient} from './stomp/stomp-client';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {StompClientBuilder} from './stomp/stomp-client-builder';
+import {NGXLogger} from 'ngx-logger';
 
 
 export class StompConfiguration {
@@ -44,6 +45,7 @@ export class StompService {
      **************************************************************************/
 
     constructor(
+        private logger: NGXLogger,
         private configuration: StompConfiguration) {
         this.connectStomp();
     }
@@ -75,26 +77,26 @@ export class StompService {
         this._client = this.openConnection();
 
         this._client.errors.subscribe(m => {
-            console.log('Got STOMP ERROR!', m);
+            this.logger.warn('Got STOMP ERROR!', m);
         }, err => {
-            console.error('Error while attempting to get ERROR!', err);
+            this.logger.error('Error while attempting to get ERROR!', err);
         });
 
         this._client.onConnect.subscribe(con => {
-            console.log('Got STOMP connection - > adding subscriptions!', con);
+            this.logger.info('Got STOMP connection - > adding subscriptions!', con);
             this._onConnectedSubject.next(this._client);
         }, err => {
-            console.error('Error while attempting to connect!', err);
+            this.logger.error('Error while attempting to connect!', err);
             this._onConnectedSubject.error(err);
         });
 
-        console.log('Attempting to connect to STOMP ...');
+        this.logger.info('Attempting to connect to STOMP ...');
         this._client.connect();
     }
 
 
     private openConnection(): StompClient {
-       return StompClientBuilder.start(this.configuration.endpointUrl)
+       return StompClientBuilder.start(this.logger, this.configuration.endpointUrl)
             .enableSockJS(this.configuration.withSockJs)
             .build();
     }

@@ -10,6 +10,7 @@ import {StompFrameMessage} from './frames/stomp-frame-message';
 import {StompFrameError} from './frames/stomp-frame-error';
 import {MessageSubscription} from './message-subscription';
 import {StompCommand} from './stomp-command';
+import {NGXLogger} from 'ngx-logger';
 
 
 export class StompConfig {
@@ -32,8 +33,8 @@ export class StompClient {
     public static readonly V1_2 = '1.2';
     public static readonly supportedVersions: '1.1,1.0';
 
-    private frameSerializer = new StompFrameSerializer();
-    private frameDeserializer = new StompFrameDeserializer();
+    private readonly frameSerializer;
+    private readonly frameDeserializer;
 
     private counter = 0;
     private connected = false;
@@ -72,10 +73,15 @@ export class StompClient {
      * Creates a new STOMP Client using the given websocket
      * @param {WebSocket} ws
      */
-    constructor(private ws: WebSocket) {
+    constructor(
+        private logger: NGXLogger,
+        private ws: WebSocket) {
         this.ws.binaryType = 'arraybuffer';
 
-        console.log('socket state:', ws.readyState);
+        this.frameSerializer = new StompFrameSerializer(logger);
+        this.frameDeserializer = new StompFrameDeserializer(logger);
+
+        logger.debug('WebSocket state:', ws.readyState);
     }
 
     /***************************************************************************
@@ -123,7 +129,7 @@ export class StompClient {
             config.headers.set('passcode', config.passcode);
         }
 
-        this.debug('Opening WebSocket...');
+        this.logger.info('Opening WebSocket...');
 
         this.ws.onmessage = (evt: MessageEvent) => {
             let unmarshalledData = this.frameDeserializer.deserializeMessage(evt.data);
@@ -134,15 +140,15 @@ export class StompClient {
         };
 
         this.ws.onclose = () => {
-            const message = `Lost connection to ${this.ws.url}`;
-            this.debug(message);
+            const message = `WS: Lost connection to ${this.ws.url}`;
+            this.logger.warn(message);
             this.cleanup();
 
             this.onError(new StompFrameError(message));
         };
 
         this.ws.onopen = () => {
-            this.debug('WebSocket opened. Attempting to connect to STOMP now...');
+            this.logger.info('WebSocket opened. Attempting to connect to STOMP now...');
 
             let headers = new Map<string, string>();
             headers.set('accept-version', '1.2');
@@ -307,7 +313,7 @@ export class StompClient {
         switch (frame.command) {
             // [CONNECTED Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECTED_Frame)
             case StompCommand.CONNECTED:
-                this.debug(`connected to server `, frame.getHeader('server'));
+                this.logger.info(`WS: connected to server `, frame.getHeader('server'));
                 this.connected = true;
                 this.setupHeartbeat(frame);
                 this._connectSubject.next(frame);
@@ -322,7 +328,7 @@ export class StompClient {
                 break;
             case StompCommand.ERROR:
                 this.onError(new StompFrameError(null, frame));
-                this.debug('error received: ', frame);
+                this.logger.warn('WS: error received: ', frame);
                 break;
             default:
                 throw new Error(`not supported STOMP command '${frame.command}'`);
@@ -336,11 +342,11 @@ export class StompClient {
     private transmit(command: StompCommand, headers: Map<string, string>, body?: string): void {
         let frame = StompFrame.build(command, headers, body);
         let out = this.frameSerializer.serialize(frame);
-        this.debug('>>> ', out);
+        this.logger.debug('WS: Sending ', out);
         while (out.length > this.maxWebSocketFrameSize) {
             this.ws.send(out.substring(0, this.maxWebSocketFrameSize));
             out = out.substring(this.maxWebSocketFrameSize);
-            this.debug('remaining = ', out.length);
+            this.logger.trace('WS: buffer remaining = ', out.length);
         }
         this.ws.send(out);
     }
@@ -364,7 +370,7 @@ export class StompClient {
 
             if (this.heartbeat.outgoing > 0 && serverOutgoing > 0) {
                 let ttl = Math.max(this.heartbeat.outgoing, serverOutgoing);
-                this.debug(`Check PING every ${ttl}ms`);
+                this.logger.info(`WS: Check PING every ${ttl}ms`);
 
                 this.pinger = setInterval(() => {
                     this.sendHeartBeat();
@@ -373,11 +379,11 @@ export class StompClient {
 
             if (this.heartbeat.incoming > 0 && serverIncoming > 0) {
                 let ttl = Math.max(this.heartbeat.incoming, serverIncoming);
-                this.debug(`check PONG every ${ttl}ms`);
+                this.logger.info(`WS: Check PONG every ${ttl}ms`);
                 this.ponger = setInterval(() => {
                     let delta = Date.now() - this.serverActivity;
                     if (delta > ttl * 2) {
-                        this.debug(`Did not receive server activity for the last ${delta}ms`);
+                        this.logger.warn(`WS: Did not receive server activity for the last ${delta}ms`);
                         this.ws.close();
                     }
                 }, ttl);
@@ -387,10 +393,6 @@ export class StompClient {
 
     private sendHeartBeat(): void {
         this.ws.send(BYTE.LF);
-        this.debug('>>> PING');
-    }
-
-    private debug(message: string, ...args: any[]) {
-        console.log(message, args);
+        this.logger.debug('WS: Sending PING');
     }
 }

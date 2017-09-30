@@ -1,6 +1,7 @@
 
 import * as SockJS from 'sockjs-client';
 import {StompClient} from './stomp-client';
+import {NGXLogger} from 'ngx-logger';
 
 /**
  * Provides the ability to build StompClients
@@ -14,6 +15,7 @@ export class StompClientBuilder {
      *                                                                         *
      **************************************************************************/
 
+    private readonly _logger: NGXLogger;
     private readonly _url: string;
     private _enableSockJS = false;
     private _protocols: string[] = ['v10.stomp', 'v11.stomp'];
@@ -31,8 +33,8 @@ export class StompClientBuilder {
      * @param {string} endpointUrl
      * @returns {StompClientBuilder}
      */
-    public static start(endpointUrl: string): StompClientBuilder {
-        return new StompClientBuilder(endpointUrl);
+    public static start(logger: NGXLogger, endpointUrl: string): StompClientBuilder {
+        return new StompClientBuilder(logger, endpointUrl);
     }
 
     /***************************************************************************
@@ -41,7 +43,8 @@ export class StompClientBuilder {
      *                                                                         *
      **************************************************************************/
 
-    private constructor(url: string) {
+    private constructor(logger: NGXLogger, url: string) {
+        this._logger = logger;
         this._url = url;
     }
 
@@ -125,6 +128,6 @@ export class StompClientBuilder {
      * @returns {StompClient}
      */
     private buildClientWith(ws: WebSocket) {
-        return new StompClient(ws);
+        return new StompClient(this._logger, ws);
     }
 }
