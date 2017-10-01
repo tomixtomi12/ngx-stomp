@@ -90,14 +90,6 @@ export class StompClient {
      *                                                                         *
      **************************************************************************/
 
-    public get connectSubject(): Subject<StompFrame> {
-        return this._connectSubject;
-    }
-
-    public set connectSubject(value: Subject<StompFrame>) {
-        this._connectSubject = value;
-    }
-
     public get receipts(): Observable<StompFrame>{
         return this.receiptSubject;
     }

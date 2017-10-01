@@ -74,16 +74,16 @@ export class StompService {
 
     private connectStomp(): void {
 
-        this._client = this.openConnection();
+        this._client = this.buildStompClient();
 
         this._client.errors.subscribe(m => {
-            this.logger.warn('Got STOMP ERROR!', m);
+            this.logger.warn('STOMP: Got ERROR!', m);
         }, err => {
             this.logger.error('Error while attempting to get ERROR!', err);
         });
 
         this._client.onConnect.subscribe(con => {
-            this.logger.info('Got STOMP connection - > adding subscriptions!', con);
+            this.logger.info('STOMP: Got connection. Ready for subscriptions.', con);
             this._onConnectedSubject.next(this._client);
         }, err => {
             this.logger.error('Error while attempting to connect!', err);
@@ -95,7 +95,7 @@ export class StompService {
     }
 
 
-    private openConnection(): StompClient {
+    private buildStompClient(): StompClient {
        return StompClientBuilder.start(this.logger, this.configuration.endpointUrl)
             .enableSockJS(this.configuration.withSockJs)
             .build();
