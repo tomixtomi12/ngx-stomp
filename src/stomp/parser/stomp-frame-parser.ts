@@ -1,6 +1,5 @@
 // Define constants for bytes used throughout the code
 
-import { NGXLogger } from 'ngx-logger';
 
 import {FrameBuffer} from './frame-buffer';
 import {StompCommand} from '../stomp-command';
@@ -18,16 +17,12 @@ export const BYTE = {
  */
 export class StompFrameDeserializer {
 
-    constructor(
-        private logger: NGXLogger) {
-    }
-
 
     public deserializeMessage(message: any): FrameBuffer {
         let data: string;
         if (typeof ArrayBuffer && message instanceof ArrayBuffer) {
             let arr = new Uint8Array(message);
-            this.logger.debug('--- got data length: ' + arr.length);
+            console.log('--- got data length: ', arr.length);
             let stringArray: string[] = [];
             arr.forEach(val => stringArray.push(String.fromCharCode(val)));
             data = stringArray.join('');
@@ -38,7 +33,7 @@ export class StompFrameDeserializer {
 
         // If heart-beats are requested and no real frame is sent, EOL is expected
         if (data === BYTE.LF) {
-            this.logger.debug('<<< heart-beat received');
+            console.log('<<< heart-beat received');
             return FrameBuffer.Empty;
         }
 
@@ -52,18 +47,12 @@ export class StompFrameDeserializer {
         let buffer = new FrameBuffer();
 
         for (let i = 0; i < frames.length - 1; i++) {
-            try {
-                const frame = this.deserializeFrame(frames[i]);
-                buffer.frames.push(frame);
-            }catch (err) {
-
-            }
+            buffer.frames.push(this.deserializeFrame(frames[i]));
         }
 
         let lastFrame = frames[frames.length - 1];
         if (lastFrame === BYTE.LF || lastFrame.search(`${BYTE.NULL}${BYTE.LF}*$`) !== -1) {
-            const frame = this.deserializeFrame(frames[frames.length - 1]);
-            buffer.frames.push();
+            buffer.frames.push(this.deserializeFrame(frames[frames.length - 1]));
         } else {
             buffer.partial = lastFrame;
         }
@@ -72,46 +61,52 @@ export class StompFrameDeserializer {
 
     private deserializeFrame(data: string): StompFrame {
 
-        // search for 2 consecutive LF bytes to split command and headers from the body
-        // let divider = data.search(`///${BYTE.LF}${BYTE.LF}///`);
-        let divider = data.search('\n\r?\n\r?');
-        let headerLines = data.substring(0, divider).split(BYTE.LF);
+        try {
+            // search for 2 consecutive LF bytes to split command and headers from the body
+            // let divider = data.search(`///${BYTE.LF}${BYTE.LF}///`);
+            let divider = data.search('\n\r?\n\r?');
+            let headerLines = data.substring(0, divider).split(BYTE.LF);
 
-        // console.log('console', divider);
-        // console.log("data chars", data.split(''));
+            // console.log('console', divider);
+            // console.log("data chars", data.split(''));
 
-        let commandStr = headerLines.shift();
-        let headers = new Map<string, string>();
-        let body = '';
+            let commandStr = headerLines.shift();
+            let headers = new Map<string, string>();
+            let body = '';
 
-        for (let line of headerLines.reverse()) {
-            let idx = line.indexOf(':');
-            headers.set(this.trim(line.substring(0, idx)), this.trim(line.substring(idx + 1)));
-        }
-
-        // skip the 2 LF bytes that divides the headers from the body
-        let start = divider + 2;
-
-        const clen = headers.get('content-length');
-
-        if (clen) {
-            let len = parseInt(clen);
-            body = ('' + data).substring(start, start + len);
-        } else {
-            let chr: string;
-            for (let i = 0; i < data.length; i++) {
-                chr = data.charAt(i);
-                if (chr === BYTE.NULL) {
-                    break;
-                }
-                body += chr;
+            for (let line of headerLines.reverse()) {
+                let idx = line.indexOf(':');
+                headers.set(this.trim(line.substring(0, idx)), this.trim(line.substring(idx + 1)));
             }
-        }
-        if (commandStr) {
-            const command = this.parseCommand(commandStr);
-            return new StompFrame(command, body, headers);
-        }else {
-            throw new Error('ArgumentNullException: commandStr was \'null\' which is not a valid command string!');
+
+            // skip the 2 LF bytes that divides the headers from the body
+            let start = divider + 2;
+
+            const clen = headers.get('content-length');
+
+            if (clen) {
+                let len = parseInt(clen);
+                body = ('' + data).substring(start, start + len);
+            } else {
+                let chr: string;
+                for (let i = 0; i < data.length; i++) {
+                    chr = data.charAt(i);
+                    if (chr === BYTE.NULL) {
+                        break;
+                    }
+                    body += chr;
+                }
+            }
+            if (commandStr) {
+                const command = this.parseCommand(commandStr);
+                return new StompFrame(command, body, headers);
+            }else {
+                throw new Error('ArgumentNullException: commandStr was \'null\' which is not a valid command string!');
+            }
+        }catch (err) {
+            // Failed to deserialize frame
+            console.warn('Failed to parse frame:', data);
+            throw err;
         }
     }
 
@@ -133,11 +128,6 @@ export class StompFrameDeserializer {
  * Provides the ability to serialize a stomp frame
  */
 export class StompFrameSerializer {
-
-
-    constructor(
-        private logger: NGXLogger) {
-    }
 
     /**
      * Compute the size of a UTF-8 string by counting its number of bytes

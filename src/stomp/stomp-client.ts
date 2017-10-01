@@ -71,15 +71,14 @@ export class StompClient {
 
     /**
      * Creates a new STOMP Client using the given websocket
-     * @param {WebSocket} ws
      */
     constructor(
         private logger: NGXLogger,
         private ws: WebSocket) {
-        this.ws.binaryType = 'arraybuffer';
 
-        this.frameSerializer = new StompFrameSerializer(logger);
-        this.frameDeserializer = new StompFrameDeserializer(logger);
+        this.ws.binaryType = 'arraybuffer';
+        this.frameSerializer = new StompFrameSerializer();
+        this.frameDeserializer = new StompFrameDeserializer();
 
         logger.debug('WebSocket state:', ws.readyState);
     }
