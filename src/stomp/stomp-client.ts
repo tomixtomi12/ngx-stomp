@@ -77,8 +77,8 @@ export class StompClient {
         private ws: WebSocket) {
 
         this.ws.binaryType = 'arraybuffer';
-        this.frameSerializer = new StompFrameSerializer();
-        this.frameDeserializer = new StompFrameDeserializer();
+        this.frameSerializer = new StompFrameSerializer(logger);
+        this.frameDeserializer = new StompFrameDeserializer(logger);
 
         logger.debug('WebSocket state:', ws.readyState);
     }

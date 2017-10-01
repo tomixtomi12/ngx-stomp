@@ -4,6 +4,7 @@
 import {FrameBuffer} from './frame-buffer';
 import {StompCommand} from '../stomp-command';
 import {StompFrame} from '../frames/stomp-frame';
+import {NGXLogger} from 'ngx-logger';
 
 export const BYTE = {
     // LINEFEED byte (octet 10)
@@ -18,11 +19,17 @@ export const BYTE = {
 export class StompFrameDeserializer {
 
 
+    constructor(
+        private logger: NGXLogger) {
+
+    }
+
+
     public deserializeMessage(message: any): FrameBuffer {
         let data: string;
         if (typeof ArrayBuffer && message instanceof ArrayBuffer) {
             let arr = new Uint8Array(message);
-            console.log('--- got data length: ', arr.length);
+            this.logger.debug('STOMP: <<< got message, length: ', arr.length);
             let stringArray: string[] = [];
             arr.forEach(val => stringArray.push(String.fromCharCode(val)));
             data = stringArray.join('');
@@ -33,7 +40,7 @@ export class StompFrameDeserializer {
 
         // If heart-beats are requested and no real frame is sent, EOL is expected
         if (data === BYTE.LF) {
-            console.log('<<< heart-beat received');
+            this.logger.debug('STOMP: <<< heart-beat received!');
             return FrameBuffer.Empty;
         }
 
@@ -105,7 +112,7 @@ export class StompFrameDeserializer {
             }
         }catch (err) {
             // Failed to deserialize frame
-            console.warn('Failed to parse frame:', data);
+            this.logger.warn('STOMP: Failed to parse frame:', data);
             throw err;
         }
     }
@@ -143,6 +150,11 @@ export class StompFrameSerializer {
             return match ? match.length : 0;
         }
         return 0;
+    }
+
+    constructor(
+        private logger: NGXLogger) {
+
     }
 
     /**
