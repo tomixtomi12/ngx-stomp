@@ -38,7 +38,44 @@ import { StompModule } from '@elderbyte/ngx-stomp';
 export class AppModule { }
 ```
 
-Once your library is imported, you can use the `StompService` by importing it into your own services / components.
+Once your library is imported, you can use the `StompService` by importing it into your own services / components:
+
+```typescript
+export class MyStompUsage {
+  constructor(
+    private logger: NGXLogger,
+    private stompService : StompService) {
+    
+    const topic = '/topic/metadata/changed';
+
+    // Subscribe to the STOMP topic ...
+
+    this.stompService.connectedClient
+      .subscribe(client => {
+        const sub = client.subscribe(topic);
+       
+        // Subscription successful -> now we can listen to messages sent to this subscription
+
+        sub.messages.subscribe(m => {
+         
+          // We got a message m, do something with it
+          
+          this.onMediaChanged(m.bodyJson);
+          
+          
+        }, err => {
+          this.logger.error('Got filtered STOMP topic error!', err);
+        })
+      }, err => {
+        this.logger.error('STOMP: Failed to subscribe!', err);
+      });
+  }
+}
+```
+
+  
+
+
 
 ## Development
 
