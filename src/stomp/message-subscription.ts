@@ -14,13 +14,11 @@ export class MessageSubscription {
 
     /**
      * Gets the internal subscription id
-     * @returns {string}
      */
     public get subscriptionId(): string{ return this._id; }
 
     /**
      * Gets the subsription destionation
-     * @returns {string}
      */
     public get destination(): string{ return this._destination; }
 

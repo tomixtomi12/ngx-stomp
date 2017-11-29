@@ -60,7 +60,6 @@ export class StompService {
      * Gets the new connected stomp client.
      * This is a good point to hook up your subscriptions.
      *
-     * @returns {Observable<StompClient>}
      */
     public get connectedClient(): Observable<StompClient> {
         return this._onConnectedSubject;

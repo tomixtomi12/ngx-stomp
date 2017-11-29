@@ -30,8 +30,7 @@ export class StompClientBuilder {
     /**
      * Creates a new StompClientBuilder, using the given endpoint url.
      *
-     * @param {string} endpointUrl
-     * @returns {StompClientBuilder}
+     * @param endpointUrl
      */
     public static start(logger: NGXLogger, endpointUrl: string): StompClientBuilder {
         return new StompClientBuilder(logger, endpointUrl);
@@ -58,8 +57,7 @@ export class StompClientBuilder {
     /**
      * Enable/Disable SockJS for the STOMP transport
      *
-     *  @param {boolean} enabled Enable or disable sock-js
-     * @returns {this}
+     *  @param enabled Enable or disable sock-js
      */
     public enableSockJS(enabled = true): this {
         this._enableSockJS = enabled;
@@ -68,8 +66,6 @@ export class StompClientBuilder {
 
     /**
      * Define the support protocols
-     * @param {string[]} protocols
-     * @returns {this}
      */
     public protocols(protocols: string[]): this {
         this._protocols = protocols;
@@ -79,7 +75,6 @@ export class StompClientBuilder {
 
     /**
      * Materializes the configuration into a stomp client.
-     * @returns {StompClient}
      */
     public build(): StompClient {
         const socket = this.getSocket();
@@ -105,7 +100,6 @@ export class StompClientBuilder {
 
     /**
      * Builds a Stomp client using SockJs as transport
-     * @param {string} url
      */
     private buildSockJS(url: string): WebSocket {
         const sockJs = new SockJS(url);
@@ -114,9 +108,7 @@ export class StompClientBuilder {
 
     /**
      * Builds a Stomp client using default browser websocket as transport
-     * @param {string} url
-     * @param {string[]} protocols
-     * @returns {StompClient}
+     * @param url
      */
     private buildNativeWebSocket(url: string): WebSocket {
         return new WebSocket(url, this._protocols);
@@ -124,8 +116,7 @@ export class StompClientBuilder {
 
     /**
      * Builds a Stomp client using the given websocket implementation
-     * @param {WebSocket} ws
-     * @returns {StompClient}
+     * @param ws The websocket connection
      */
     private buildClientWith(ws: WebSocket): StompClient {
         return new StompClient(this._logger, ws);

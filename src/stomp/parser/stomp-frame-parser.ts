@@ -140,8 +140,7 @@ export class StompFrameSerializer {
      * Compute the size of a UTF-8 string by counting its number of bytes
      * (and not the number of characters composing the string)
      *
-     * @param {string} value
-     * @returns {number} number of bytes in the string
+     * @returns number of bytes in the string
      */
     private static getUTF8Length(value: string | null): number {
         if (value) {
@@ -161,7 +160,7 @@ export class StompFrameSerializer {
      * Computes a textual representation of the frame.
      * Suitable to be sent to the server
      *
-     * @returns {string} A textual representation of the frame
+     * @returns A textual representation of the frame
      */
     public serialize(frame: StompFrame): string {
         let commandStr = StompCommand[frame.command];

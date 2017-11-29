@@ -11,13 +11,7 @@ import {StompFrameError} from './frames/stomp-frame-error';
 import {MessageSubscription} from './message-subscription';
 import {StompCommand} from './stomp-command';
 import {NGXLogger} from 'ngx-logger';
-
-
-export class StompConfig {
-    public headers = new Map<string, string>();
-    public login?: string;
-    public passcode?: string;
-}
+import {StompConfig} from './stomp-config';
 
 
 export class StompClient {
@@ -29,9 +23,6 @@ export class StompClient {
      **************************************************************************/
 
     public static readonly V1_0 = '1.0';
-    public static readonly V1_1 = '1.1';
-    public static readonly V1_2 = '1.2';
-    public static readonly supportedVersions: '1.1,1.0';
 
     private readonly frameSerializer;
     private readonly frameDeserializer;
@@ -57,7 +48,6 @@ export class StompClient {
      * maximum *WebSocket* frame size sent by the client. If the STOMP frame
      * is bigger than this value, the STOMP frame will be sent using multiple
      * WebSocket frames (default is 16KiB)
-     * @type {number}
      */
     private maxWebSocketFrameSize = 16 * 1024;
     private subscriptions = new Map<string, MessageSubscription>();

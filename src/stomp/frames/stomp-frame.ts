@@ -49,7 +49,6 @@ export class StompFrame {
      * Otherwise, returns null.
      *
      * @param key
-     * @returns {undefined|string}
      */
     public getHeader(key: string): string | null {
         const value = this._headers.get(key);
@@ -61,7 +60,6 @@ export class StompFrame {
      *  Otherwise, throws an exception.
      *
      * @param key
-     * @returns {string}
      */
     public getRequiredHeader(key: string): string {
         let header = this.getHeader(key);
